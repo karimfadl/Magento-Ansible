@@ -1,0 +1,12 @@
+---
+- name: Copy The EPEL Repository
+  template: src=epel.repo dest=/etc/yum.repos.d/
+
+- name: Copy The Mysql Repository
+  template: src=mysql-community.repo dest=/etc/yum.repos.d/
+
+- name: Copy The PHP Repository
+  template: src=ius.repo dest=/etc/yum.repos.d/
+  
+- name: Copy the newrelic repository definition
+  template: src=newrelic.repo dest=/etc/yum.repos.d/

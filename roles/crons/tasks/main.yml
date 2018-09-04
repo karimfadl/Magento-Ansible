@@ -1,0 +1,16 @@
+---
+- name: "Setup Magento2 crons : Create maintenance cron"
+  cron: name="Magento maintenance"
+        user="apache" job="php -c /etc {{ root_dir }}/bin/magento cron:run"
+
+- name: "Setup Magento2 crons : Create update cron"
+  cron: name="Magento update cron"
+        user="apache" job="php -c /etc {{ root_dir }}/update/cron.php"
+
+- name: "Setup Magento2 crons : Create Magento setup cron"
+  cron: name="Magento setup cron"
+        user="apache" job="php -c /etc {{ root_dir }}/bin/magento setup:cron:run"
+
+- name: restart apache
+  service: name=httpd state=restarted enabled=yes
+

@@ -1,0 +1,13 @@
+---
+- name: Install Apache, PHP, Mariadb, Magento, New Relic and Secure the system
+  hosts: webserver
+  remote_user: root
+  roles:
+    - common
+    - apache
+    - mysql
+    - php
+    - magento
+    - crons
+    #- secure_db
+    - newrelic

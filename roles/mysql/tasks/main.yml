@@ -1,0 +1,26 @@
+---
+
+- name: Install Mysql Package
+  yum: name={{ item }} state=installed
+  with_items:
+   - mysql-community-server
+   - MySQL-python
+
+- name: Start Mysql Service
+  service: name=mysqld state=started enabled=yes
+
+- name: Change Mysql Root Password And Keep Track In
+  shell: grep 'temporary password' /var/log/mysqld.log | awk '{print $NF}'
+  register: root_temp_pass
+- debug: msg="{{ root_temp_pass.stdout }}"
+
+- name: Set Root Password
+  shell: mysqladmin -u root --password="{{ root_temp_pass.stdout }}" password "{{ mysql_root_password }}"
+  register: mysql_admin_root_password_result
+  failed_when: "'(using password: NO)' in mysql_admin_root_password_result.stderr"
+
+- name: Create Magento Database
+  mysql_db: login_user="{{ mysql_root_username }}" login_password="{{ mysql_root_password }}" name={{ mg_db_name }} state=present
+
+- name: Create Magento Database User
+  mysql_user: login_user="{{ mysql_root_username }}" login_password="{{ mysql_root_password }}" name={{ mg_db_user }} password={{ mg_db_password }} priv={{ mg_db_name }}.*:ALL host='{{ web_host }}' state=present

@@ -1,0 +1,33 @@
+---
+- name: Download Magento
+  get_url: url=https://github.com/magento/magento2/archive/{{ mg_version }}.tar.gz  dest=/home/{{ sys_user }}/pub_html/
+
+- name: Extract Archive
+  command: tar -xvzf /home/{{ sys_user }}/pub_html/magento2-{{ mg_version }}.tar.gz -C /home/{{ sys_user }}/pub_html/
+
+- name: Rename Magento Directory
+  command: mv /home/{{ sys_user }}/pub_html/magento2-{{ mg_version }} /home/{{ sys_user }}/pub_html/magento
+
+- name: Give Apache as Owner Root Directory
+  command: chown -R apache:apache /home/{{ sys_user }}/pub_html/magento
+
+- name: Give Permissions To Magento Files
+  command: find /home/{{ sys_user }}/pub_html/magento/ -type f -exec chmod 640 {} \;
+
+- name: Give Permissions To Magento Directories
+  command: find /home/{{ sys_user }}/pub_html/magento/ -type d -exec chmod 750 {} \;
+
+- name: Give Execute Permissions To Magento Installation File
+  command: chmod 750 /home/{{ sys_user }}/pub_html/magento/bin/magento
+
+- name: Copy Magento Composer Script
+  template: src=composer.sh dest=/home/{{ sys_user }}/pub_html/magento/
+
+- name: Give Execute Permissions To Magento Composer Installation File
+  command: chmod 755 /home/{{ sys_user }}/pub_html/magento/composer.sh
+
+- name: Install Magento Composer Script
+  shell: (cd /home/{{ sys_user }}/pub_html/magento/ && exec /home/{{ sys_user }}/pub_html/magento/composer.sh)
+
+- name: Start apache service
+  service: name=httpd state=started enabled=yes
